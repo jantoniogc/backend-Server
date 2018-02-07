@@ -27,7 +27,6 @@ app.post('/google', (req, res) => {
         // audience: GOOGLE_CLIENT_ID,
         // maxExpiry
     }, (err, login) => {
-        console.log(err);
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -37,8 +36,7 @@ app.post('/google', (req, res) => {
         }
         var payload = login.getPayload();
         var userid = payload['sub'];
-
-        Usuario.findOne({ enail: payload.email }, (err, usuario) => {
+        Usuario.findOne({ email: payload.email }, (err, usuario) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,

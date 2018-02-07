@@ -87,7 +87,7 @@ app.put('/:id', mdAuthentic.verificaTocken, (req, res) => {
 
 
 // Crear nuevo usuario
-app.post('/', mdAuthentic.verificaTocken, (req, res) => {
+app.post('/', (req, res) => {
 
     var body = req.body;
     var usuario = new Usuario({
