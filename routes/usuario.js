@@ -78,7 +78,7 @@ app.put('/:id', mdAuthentic.verificaTocken, (req, res) => {
             usuarioGuardado.password = ':)';
             res.status(200).json({
                 ok: true,
-                body: usuarioGuardado
+                usuario: usuarioGuardado
             });
         })
 
