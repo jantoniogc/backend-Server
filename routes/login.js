@@ -7,6 +7,8 @@ const SEED = require('../config/config').SEED;
 const GOOGLE_CLIENT_ID = require('../config/config').CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = require('../config/config').CLIENT_SECRET;
 
+
+
 // Incicializar variables
 var app = express();
 
@@ -14,6 +16,17 @@ var Usuario = require('../models/usuario');
 
 var googleAuth = require('google-auth-library');
 
+var mdAuthenticacion = require('../middleware/autenticacion');
+
+app.get('/renuevatoken', mdAuthenticacion.verificaTocken, (req, res) => {
+    
+    var tocken = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: 14400 })
+    res.status(200).json({
+        ok: true,
+        tocken: tocken
+    });
+
+});
 
 
 // Authenticacion de Google
@@ -51,7 +64,7 @@ app.post('/google', (req, res) => {
                         mensaje: 'Debe usar su authenticacion normal',
                         errors: err
                     });
-                }else {
+                } else {
                     usuario.password = ':)';
                     var tocken = jwt.sign({ usuario: usuario }, SEED, { expiresIn: 14400 }) // 4 Horas
 
@@ -59,10 +72,11 @@ app.post('/google', (req, res) => {
                         ok: true,
                         usuario: usuario,
                         id: usuario._id,
-                        tocken: tocken
+                        tocken: tocken,
+                        menu: obtenerMenu(usuario.role)
                     });
                 }
-            }else{ // Si el usuario no existe lo creamos
+            } else { // Si el usuario no existe lo creamos
                 var usuario = new Usuario();
                 usuario.nombre = payload.name;
                 usuario.email = payload.email;
@@ -81,7 +95,8 @@ app.post('/google', (req, res) => {
                         ok: true,
                         usuario: usuarioAlmacenado,
                         id: usuarioAlmacenado._id,
-                        token: token
+                        token: token,
+                        menu: obtenerMenu(usuarioAlmacenado.role)
                     });
                 })
             }
@@ -126,11 +141,87 @@ app.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             id: usuarioDB._id,
-            tocken: tocken
+            tocken: tocken,
+            menu: obtenerMenu(usuarioDB.role)
         });
     })
 });
 
+function obtenerMenu(role) {
+    var menu = [
+        {
+            titulo: 'Principal',
+            icono: 'mdi mdi-gauge',
+            submenu: [
+                {
+                    titulo: 'Dashboard',
+                    url: '/dashboard'
+                },
+                {
+                    titulo: 'ProgressBar',
+                    url: '/progress'
+                },
+                {
+                    titulo: 'Gráficas',
+                    url: '/graficas1'
+                },
+                {
+                    titulo: 'Promesas',
+                    url: '/promesas'
+                },
+                {
+                    titulo: 'Rxjs',
+                    url: '/rxjs'
+                }
+            ]
+        },
+        {
+            titulo: 'Mantenimiento',
+            icono: 'mdi mdi-folder-lock-open',
+            submenu: [
+                // {
+                //     titulo: 'Usuario',
+                //     url: '/usuarios'
+                // },
+                {
+                    titulo: 'Hospitales',
+                    url: '/hospitales'
+                },
+                {
+                    titulo: 'Medicos',
+                    url: '/medicos'
+                }
+            ]
+        },
+        {
+            titulo: 'Otros',
+            icono: 'mdi mdi-folder-account',
+            submenu: [
+                {
+                    titulo: 'About',
+                    url: '/about'
+                },
+                {
+                    titulo: 'Users',
+                    url: '/users'
+                },
+                {
+                    titulo: 'Cash',
+                    url: '/cash'
+                },
+                {
+                    titulo: 'Cars',
+                    url: '/cars'
+                }
+            ]
+        }
+    ];
 
+    if (role === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift({ titulo: 'Usuario', url: '/usuarios' })
+    }
+
+    return menu;
+}
 
 module.exports = app;

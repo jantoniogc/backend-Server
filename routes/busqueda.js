@@ -76,7 +76,7 @@ function buscarHospitales(busqueda, desde, regex) {
         Hospital.find({ nombre: regex })
             .skip(desde) // se salta los primero registros indicados en la variable "desde"
             .limit(5)
-            .populate('usuario', 'nombre email img role google')
+            .populate('usuario', 'nombre email img')
             .exec((err, hospitales) => {
                 if (err) {
                     reject('Error al cargar Hostpirales');
@@ -90,10 +90,10 @@ function buscarHospitales(busqueda, desde, regex) {
 function buscarMedicos(busqueda, desde, regex) {
     return new Promise((resolve, reject) => {
         Medico.find({ nombre: regex })
-            .count((err, count) => {console.log(count)})
+            // .count((err, count) => {console.log(count)})
             .skip(desde) // se salta los primero registros indicados en la variable "desde"
             .limit(5)
-            .populate('usuario', 'nombre email role img google')
+            .populate('usuario', 'nombre email img')
             .populate('hospital')
             .exec((err, medicos) => {
                 if (err) {

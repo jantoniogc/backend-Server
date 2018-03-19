@@ -43,7 +43,8 @@ app.post('/', mdAuthentic.verificaTocken, (req, res) => {
     var body = req.body;
     var hospital = new Hospital({
         nombre: body.nombre,
-        usuario: req.usuario._id
+        usuario: req.usuario._id,
+        img: body.img
     })
     hospital.save((err, hospitalGuardado) => {
         if (err) {
